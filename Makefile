@@ -1,10 +1,10 @@
 CXX = g++
 CXXFLAGS = -fopenmp -std=c++11
 
-all: producer_consumer
+all: main
 
-producer_consumer: main.cpp queue.h
-	$(CXX) $(CXXFLAGS) main.cpp -o producer_consumer
+main: main.c
+	$(CXX) $(CXXFLAGS) $< -o $@
 
 clean:
-	rm -f producer_consumer
+	rm -f main
