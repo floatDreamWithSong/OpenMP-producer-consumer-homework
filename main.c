@@ -155,6 +155,7 @@ void consumer(Queue* q, int id) {
 }
 
 int main() {
+    omp_set_num_threads(8);
     Queue queue;
     initQueue(&queue);
     const char* files[NUM_PRODUCERS] = {
