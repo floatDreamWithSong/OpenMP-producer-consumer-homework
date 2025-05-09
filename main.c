@@ -155,33 +155,25 @@ void consumer(Queue* q, int id) {
 }
 
 int main() {
-    omp_set_num_threads(8);
+    omp_set_num_threads(NUM_PRODUCERS + NUM_CONSUMERS);
     Queue queue;
     initQueue(&queue);
     const char* files[NUM_PRODUCERS] = {
         "file1.txt", "file2.txt", "file3.txt", "file4.txt"
     };
 
-    #pragma omp parallel sections num_threads(NUM_PRODUCERS + NUM_CONSUMERS)
+    #pragma omp parallel
     {
-        // 生产者sections
-        #pragma omp section
-        {
-            #pragma omp parallel for num_threads(NUM_PRODUCERS)
-            for (int i = 0; i < NUM_PRODUCERS; i++) {
-                producer(&queue, files[i], i);
-            }
-        }
-
-        // 消费者sections
-        #pragma omp section
-        {
-            #pragma omp parallel for num_threads(NUM_CONSUMERS)
-            for (int i = 0; i < NUM_CONSUMERS; i++) {
-                consumer(&queue, i);
-            }
+        int id = omp_get_thread_num();
+        if (id < NUM_PRODUCERS) {
+            // 生产者线程
+            producer(&queue, files[id], id);
+        } else {
+            // 消费者线程
+            consumer(&queue, id - NUM_PRODUCERS);
         }
     }
+
     printf("总共计数：%d，应计数150*4=600\n", queue.enqueued);
     destroyQueue(&queue);
     return 0;
